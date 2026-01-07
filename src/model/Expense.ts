@@ -37,6 +37,7 @@ export type Expense = {
   title: string;
   desc: string;
   amount: number;
+  category:string;
   type: ExpenseType;
   date: string; 
 };
