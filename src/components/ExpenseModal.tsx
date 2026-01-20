@@ -9,7 +9,7 @@ import {
   
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { ExpenseType } from "../model/Expense";
+import { EXPENSE_CATEGORIES, ExpenseType } from "../model/Expense";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
 import { useExpenseStore } from "../store/expenseStore";
@@ -21,6 +21,15 @@ type Props = {
   onSave?: (data: { title: string; amount: string }) => void;
 };
 
+function CategoryItem(){
+  return(
+    <View style={{flex :1, height:"100%", width:"90%" ,alignSelf:'center',backgroundColor:'red'}}>
+      <Text>jdfasljfdj</Text>
+
+    </View>
+  )
+}
+
 export default function AddExpenseModal({
   visible,
   onClose,
@@ -30,6 +39,8 @@ export default function AddExpenseModal({
   const [defaultValue,setDefaultValue]=useState<ExpenseType>('expense');
   const [amount, setAmount] = React.useState("");
   const [desc, setDesc]=useState("");
+  const [category,setCategory]=useState("")
+  const [categoryItemVisible,setCategoryItemVisible]=useState(false);
  const {
     expenses,
     hydrate,
@@ -39,7 +50,7 @@ export default function AddExpenseModal({
   } = useExpenseStore();
 
   const handleSave = () => {
-    addTransaction({title:title,type:defaultValue,amount:Number(amount),desc:desc})  
+    addTransaction({title:title,type:defaultValue,amount:Number(amount),desc:desc,category:category})  
     setTitle("");
     setAmount("");
     onClose();
@@ -95,6 +106,7 @@ export default function AddExpenseModal({
   </Picker>
 
 
+
   <Ionicons
     name="chevron-down"
     size={20}
@@ -103,6 +115,8 @@ export default function AddExpenseModal({
     pointerEvents="none"
   />
 </View>
+<CategoryItem/>
+
 
 
 

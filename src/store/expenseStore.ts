@@ -1,12 +1,24 @@
 import { create } from "zustand";
-import { Expense, ExpenseType } from "../model/Expense";
+import { Expense, ExpenseCategory, ExpenseType } from "../model/Expense";
 import { getExpenses, setExpenses } from "../storage/expenseStorage";
 import { isTodaysTransactions } from "../utils/helperMethods";
+import { ToastAndroid } from "react-native";
+
+
+const validateTransaction = (payload: TransactionPayload): string | null => {
+  if (!payload.title.trim()) return "Title is required";
+  if (!payload.amount || payload.amount <= 0) return "Amount must be greater than 0";
+  if (!payload.type) return "Transaction type is required";
+  if (!payload.category) return "Category is required";
+
+  return null;
+};
 
 type TransactionPayload = {
   title: string;
   desc: string;
   amount: number;
+  category:string;
   type: ExpenseType;
 };
 
@@ -74,24 +86,36 @@ export const useExpenseStore = create<ExpenseStore>((set, get) => ({
   },
 
 
-  addTransaction: ({ title, desc, amount, type }) => {
-    const newTransaction: Expense = {
-      id: new Date(),
-      title,
-      desc,
-      amount,
-      type,
-      date: new Date().toISOString(),
-    };
+ addTransaction: (payload) => {
+  const error = validateTransaction(payload);
 
-    const updatedTransaction = [newTransaction, ...get().expenses];
-    const todaysTrans=updatedTransaction.filter((e)=>isTodaysTransactions(e.date,new Date()));
-    setExpenses(updatedTransaction);
-    set({ expenses: updatedTransaction ,todaysTransactions:todaysTrans})
-    get().calculateTotal();
+  if (error) {
+    ToastAndroid.show(error,ToastAndroid.SHORT);
+    return;
+  }
 
+  const newTransaction: Expense = {
+    id: new Date(),
+    title: payload.title.trim(),
+    desc: payload.desc,
+    amount: payload.amount,
+    type: payload.type,
+    category: payload.category,
+    date: new Date().toISOString(),
+  };
 
-  },
+  const updatedTransaction = [newTransaction, ...get().expenses];
+  const todaysTrans = updatedTransaction.filter((e) =>
+    isTodaysTransactions(e.date, new Date())
+  );
+
+  setExpenses(updatedTransaction);
+  set({ expenses: updatedTransaction, todaysTransactions: todaysTrans });
+  get().calculateTotal();
+
+ToastAndroid.show("success",ToastAndroid.SHORT);
+},
+
 
   removeTransaction: (_id: Date) => {
     const updatedItem = get().expenses.filter((e) => e.id !== _id)

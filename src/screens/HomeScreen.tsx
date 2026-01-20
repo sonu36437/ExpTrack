@@ -13,11 +13,15 @@ import RemoveTransactionModal from "../components/RemoveTransactionModal";
 import Modal from "../components/Modal";
 import TransactionsCard from "../components/TransactionsCard";
 
+
 import { useExpenseStore } from "../store/expenseStore";
+
 
 export default function HomeScreen() {
   const [addVisible, setAddVisible] = useState(false);
   const [removeVisible, setRemoveVisible] = useState(false);
+
+
 
   const {
     expenses,
@@ -27,7 +31,8 @@ export default function HomeScreen() {
     currentSelectedTransaction,
     totalAmount,
     totalExpenses,
-    setCurrentlySelectedTransaction
+    setCurrentlySelectedTransaction,
+    removeTransaction
   } = useExpenseStore();
   console.log("RmodalVisible =", removeVisible);
 
@@ -37,7 +42,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-            <Modal visible={removeVisible} animationType="slide" onRequestClose={()=>setRemoveVisible(false)}>
+      <Modal visible={removeVisible} animationType="slide" onRequestClose={() => setRemoveVisible(false)}>
 
       </Modal>
       <View style={styles.container}>
@@ -73,14 +78,14 @@ export default function HomeScreen() {
           renderItem={({ item }) => (
             <TransactionsCard
               item={item}
-              onLongPress={()=>{
-            setRemoveVisible(!removeVisible)
-            console.log(removeVisible);
-            
-                
-                
+              onLongPress={() => {
+                setRemoveVisible(!removeVisible)
+                console.log(removeVisible);
+
+
+
               }}
-  
+
             />
           )}
         />
@@ -98,21 +103,22 @@ export default function HomeScreen() {
         visible={addVisible}
         onClose={() => setAddVisible(false)}
       />
-          <Modal visible={removeVisible} animationType="fade" onRequestClose={()=>setRemoveVisible(false)}>
-        <RemoveTransactionModal 
-         onNoClick={()=>{
-          setRemoveVisible(false)
-       
-          
+      <Modal visible={removeVisible} animationType="fade" onRequestClose={() => setRemoveVisible(false)}>
+        <RemoveTransactionModal
+          onNoClick={() => {
+            setRemoveVisible(false)
+            setCurrentlySelectedTransaction(null)
+          }}
+          onYesClick={() => {
+            currentSelectedTransaction != null && removeTransaction(currentSelectedTransaction.id)
+            setRemoveVisible(false);
 
-          setCurrentlySelectedTransaction(null)
-        }}  
-        onYesClick={()=>{}}
-         />
+          }}
+        />
       </Modal>
 
 
-  
+
     </SafeAreaView>
   );
 }
